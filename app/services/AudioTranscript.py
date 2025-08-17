@@ -2,7 +2,6 @@ from app.services.ChatInterface import ChatInterface
 from app.services.prompts.audio_extractor import prompt_extrator
 from app.models.models import AudioResponse
 from pydantic_ai import BinaryContent
-import asyncio
 from fastapi import UploadFile
 from app.services.AgentOrchestrator import AgentOrchestrator
 
@@ -12,15 +11,11 @@ class AudioTranscript:
         self.chat_interface = ChatInterface()
 
     async def convert_audio_to_bytes(self, audio_file: UploadFile) -> bytes:
-        # Como o arquivo está vindo via UploadFile (FastAPI), podemos ler os bytes diretamente do objeto sem salvar no disco.
-        audio_bytes = await audio_file.read()
 
-        bytes_content = BinaryContent(data=audio_bytes, media_type="audio/webm")
+        bytes_content = BinaryContent(data=audio_file, media_type="audio/webm")
         return bytes_content
 
-    async def transcript_audio(
-        self, audio_file: UploadFile, agent_orchestrator: AgentOrchestrator
-    ) -> dict:
+    async def transcript_audio(self, audio_file: UploadFile) -> AudioResponse:
         """
         Realiza a transcrição do áudio recebido, utilizando o agente de IA configurado.
         O input_type deve ser BinaryContent, pois estamos enviando o conteúdo binário do áudio.
@@ -40,8 +35,4 @@ class AudioTranscript:
             [await self.convert_audio_to_bytes(audio_file)]
         )
 
-        results = await agent_orchestrator.process_audio_transcript(
-            audio_transcript.output
-        )
-
-        return results
+        return audio_transcript

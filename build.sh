@@ -22,7 +22,18 @@ fi
 
 # Build da imagem Docker
 echo "�� Construindo imagem Docker..."
-docker build -t medical-ai-api .
+docker build \
+  --build-arg GOOGLE_API_KEY="$GOOGLE_API_KEY" \
+  --build-arg SECRET_KEY="$SECRET_KEY" \
+  --build-arg API_KEY="$API_KEY" \
+  -t medical-ai-api .
+
+docker run -d \
+  -p 8005:8005 \
+  -e GOOGLE_API_KEY="$GOOGLE_API_KEY" \
+  -e SECRET_KEY="$SECRET_KEY" \
+  -e API_KEY="$API_KEY" \
+  medical-ai-api
 
 if [ $? -eq 0 ]; then
     echo "✅ Imagem construída com sucesso!"

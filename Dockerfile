@@ -35,6 +35,18 @@ USER appuser
 # Expor a porta
 EXPOSE 8005
 
+# Variáveis de ambiente para configuração da aplicação
+ARG GOOGLE_API_KEY
+ENV GOOGLE_API_KEY=${GOOGLE_API_KEY}
+
+ARG SECRET_KEY
+ENV SECRET_KEY=${SECRET_KEY}
+
+ARG ENCRYPTION_API_KEY
+ENV ENCRYPTION_API_KEY=${ENCRYPTION_API_KEY}
+
+
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8005/ || exit 1

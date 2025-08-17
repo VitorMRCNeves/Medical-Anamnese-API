@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from typing import Dict, Type
+from pydantic import BaseModel, Field, create_model
 
 
 class User(BaseModel):
@@ -18,39 +19,48 @@ class AudioResponse(BaseModel):
     transcription: str
 
 
-class PatientInfo(BaseModel):
-    nome_completo: str
-    idade: int
-    sexo: str
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
-class MainComplaint(BaseModel):
-    sintoma_principal: str
-    duracao_sintomas: str
-    caracteristicas_sintomas: str
+def criar_modelo_pydantic(json_data: dict) -> Type[BaseModel]:
+    """
+    Cria uma classe Pydantic dinamicamente a partir do payload recebido da API.
 
+    Args:
+        json_data (dict): Dicionário contendo as definições dos campos.
 
-class MedicalHistory(BaseModel):
-    condicoes_previas: str
-    cirurgias_anteriores: str
-    hospitalizacoes: str
+    Returns:
+        Type[BaseModel]: Classe Pydantic gerada dinamicamente.
+    """
 
+    type_map = {
+        "text": str,
+        "textarea": str,
+        "string": str,
+        "number": float,
+        "integer": int,
+        "float": float,
+        "date": str,
+        "boolean": bool,
+        "bool": bool,
+    }
 
-class MedicationHistory(BaseModel):
-    medicamentos_em_uso: str
-    dosagens: str = None
-    duracao_tratamento: str = None
+    fields: Dict[str, tuple] = {}
+    for field in json_data["fields"]:
+        field_type = field.get("type", "string")
+        pydantic_type = type_map.get(field_type, str)
+        required = field.get("required", False)
+        default = ... if required else None
+        description = field.get("llm_instruction", "")
 
+        fields[field["title"]] = (
+            pydantic_type,
+            Field(default, description=description),
+        )
 
-class PatientAllergies(BaseModel):
-    medicamentos: str = None
-    alimentos: str = None
-    outras_substancias: str = None
+    class_name = json_data.get("template_name", "DynamicModel").replace(" ", "")
 
-
-class PatientFamilyHistory(BaseModel):
-    historico_familiar: str
-
-
-class VitalSigns(BaseModel):
-    sinais_vitais: str
+    DynamicModel = create_model(class_name, **fields)
+    return DynamicModel

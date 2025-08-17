@@ -48,5 +48,11 @@ Organize a transcrição seguindo a estrutura padrão de anamnese.
 - Informações organizadas logicamente
 - Sem omissões de dados relevantes
 
+## ESTRUTURAÇÃO PARA APRESENTAÇÃO AO USUÁRIO FINAL
+- Além da transcrição completa, organize o texto em seções claramente identificadas, como: Identificação do Paciente, Queixa Principal, História da Doença Atual, Antecedentes, Medicações em Uso, Exame Físico, Hipóteses Diagnósticas, Conduta, e Observações Finais.
+- Utilize títulos e subtítulos para cada seção, facilitando a leitura e compreensão pelo usuário final.
+- Sempre que possível, utilize listas para sintomas, medicações, antecedentes e outros dados que possam ser apresentados de forma estruturada.
+- Mantenha a ordem lógica e clínica das informações, separando claramente cada parte da anamnese.
+- Garanta que a transcrição seja adequada para visualização em sistemas eletrônicos, com boa divisão de blocos de texto e destaque para informações relevantes.
 Agora, transcreva o áudio da anamnese médica seguindo rigorosamente estas diretrizes.
 """

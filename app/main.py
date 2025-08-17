@@ -10,4 +10,3 @@ app.include_router(audio.router)
 @app.get("/")
 def read_root():
     return {"message": "Hello, World!"}
-
