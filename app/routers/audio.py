@@ -4,6 +4,11 @@ from app.services.AudioTranscript import AudioTranscript
 from app.services.AgentOrchestrator import AgentOrchestrator
 from app.security.security import SecurityManager
 import json
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
+
 
 router = APIRouter(prefix="/audio", tags=["audio"])
 
@@ -14,6 +19,7 @@ def get_audio():
 
 
 @router.post("/upload")
+@limiter.limit("10/minute")
 async def upload_audio(
     headers: Request,
     file: UploadFile = File(...),
@@ -22,6 +28,13 @@ async def upload_audio(
 ) -> AudioResponse:
 
     security_manager.authenticate_user(headers)
+
+    if file.size > 50 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Arquivo muito grande")
+
+    allowed_extensions = [".wav", ".mp3", ".m4a", ".webm"]
+    if not any(file.filename.endswith(ext) for ext in allowed_extensions):
+        raise HTTPException(status_code=400, detail="Formato de arquivo não suportado")
 
     if not file.content_type.startswith("audio/"):
         raise HTTPException(status_code=400, detail="Arquivo deve ser de áudio")
@@ -37,6 +50,7 @@ async def upload_audio(
 
 
 @router.post("/prontuario")
+@limiter.limit("10/minute")
 async def get_prontuario(
     headers: Request,
     json_data: dict,
@@ -56,11 +70,3 @@ async def get_prontuario(
         raise HTTPException(status_code=400, detail="Transcrição no formato errado")
 
     return json.loads(await agent_orchestrator.process_audio_transcript(json_data))
-
-
-# @router.post("/summary")
-# async def get_patient_summary(
-#     json_data: dict,
-#     amnanesis_summary: AmnanesisSummary = Depends(AmnanesisSummary),
-# ) -> dict:
-#     return await amnanesis_summary.get_patient_summary(json_data, agent_orchestrator)

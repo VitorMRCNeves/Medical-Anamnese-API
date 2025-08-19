@@ -73,7 +73,6 @@ class SecurityManager:
             )
 
         self.decode_jwt(authorization_header[7:])
-        print(f"Token decodificado com sucesso!!")
 
     def b64u_enc(self, b: bytes) -> str:
         """
