@@ -4,10 +4,6 @@ from app.services.AudioTranscript import AudioTranscript
 from app.services.AgentOrchestrator import AgentOrchestrator
 from app.security.security import SecurityManager
 import json
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-
-limiter = Limiter(key_func=get_remote_address)
 
 
 router = APIRouter(prefix="/audio", tags=["audio"])
@@ -19,7 +15,6 @@ def get_audio():
 
 
 @router.post("/upload")
-@limiter.limit("10/minute")
 async def upload_audio(
     headers: Request,
     file: UploadFile = File(...),
@@ -50,7 +45,6 @@ async def upload_audio(
 
 
 @router.post("/prontuario")
-@limiter.limit("10/minute")
 async def get_prontuario(
     headers: Request,
     json_data: dict,
