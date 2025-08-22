@@ -11,16 +11,24 @@ app.include_router(audio.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://djagomedical-production.up.railway.app"
+        "https://oniva.up.railway.app",
+        "http://localhost:8045",
+        "http://localhost:8005",
+        "http://127.0.0.1:8005",
     ],  # Apenas seus domínios
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
-# Trusted hosts
+# Trusted hosts - CONFIGURAÇÃO CORRIGIDA
 app.add_middleware(
-    TrustedHostMiddleware, allowed_hosts=["djagomedical-production.up.railway.app"]
+    TrustedHostMiddleware,
+    allowed_hosts=[
+        "oniva.up.railway.app",
+        "localhost",
+        "127.0.0.1",
+    ],
 )
 
 
