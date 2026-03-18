@@ -1,14 +1,12 @@
-from app.services.ChatInterface import ChatInterface
-from app.services.prompts.audio_extractor import prompt_extrator
 from app.models.models import AudioResponse
 from pydantic_ai import BinaryContent
 from fastapi import UploadFile
-from app.services.AgentOrchestrator import AgentOrchestrator
+from agents.transcritor import TranscriptAgent
 
 
 class AudioTranscript:
-    def __init__(self):
-        self.chat_interface = ChatInterface()
+    def __init__(self, deps):
+        self.deps
 
     async def convert_audio_to_bytes(self, audio_file: UploadFile) -> bytes:
 
@@ -27,12 +25,8 @@ class AudioTranscript:
         Returns:
             AudioResponse: Objeto contendo a transcrição.
         """
-        agent = self.chat_interface.create_agent(
-            system_prompt=prompt_extrator(),
-            output_type=AudioResponse,
+        agent = TranscriptAgent(self.deps, self.deps.google_model)
+        audio_transcript = agent.execute(
+            audio=await self.convert_audio_to_bytes(audio_file)
         )
-        audio_transcript = await agent.run(
-            [await self.convert_audio_to_bytes(audio_file)]
-        )
-
         return audio_transcript

@@ -3,7 +3,10 @@ from app.routers import audio
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 import os
+from config.ConfigDependencies import AppDependencies
 
+
+deps = AppDependencies.load_dependencies()
 app = FastAPI()
 
 
@@ -22,19 +25,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configuração de hosts confiáveis baseada no ambiente
-IS_PRODUCTION = (
-    os.getenv("RAILWAY_ENVIRONMENT") is not None or os.getenv("PORT") is not None
-)
 
-if IS_PRODUCTION:
-    # Em produção, seja mais permissivo com IPs internos
+if deps.is_production:
+
     trusted_hosts = [
         "oniva.up.railway.app",
-        "*",  # Railway usa IPs dinâmicos internos
+        "*",
     ]
 else:
-    # Em desenvolvimento, seja mais restritivo
     trusted_hosts = [
         "localhost",
         "127.0.0.1",
@@ -50,4 +48,4 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, World!"}
+    return {"status": "ok"}
