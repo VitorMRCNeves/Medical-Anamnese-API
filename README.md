@@ -1,30 +1,30 @@
 # API de Transcrição e Estruturação de Anamnese com IA
 
-API em `FastAPI` para receber audio criptografado de consultas, transcrever com LLM e estruturar dados de anamnese em JSON dinamico para integracao com sistemas clinicos existentes.
+API em `FastAPI` para receber áudio criptografado de consultas, transcrever com LLM e estruturar dados de anamnese em JSON dinâmico para integração com sistemas clínicos existentes.
 
-O projeto foi desenhado com foco de acoplar capacidades de IA em uma arquitetura de servico ja existente, com camadas claras de seguranca, orquestracao, prompts configuraveis e deploy em producao.
+O projeto foi desenhado com foco em acoplar capacidades de IA a uma arquitetura de serviço já existente, com camadas claras de segurança, orquestração, prompts configuráveis e deploy em produção.
 
 ## Objetivo do projeto
 
-- Integrar IA de forma pragmatica em um backend de API.
-- Transformar audio medico em dado estruturado consumivel por sistemas previos (EHR, prontuario eletronico, CRM clinico, automacoes).
-- Garantir seguranca no transporte/processamento de audio (JWT + AES-GCM).
-- Permitir evolucao rapida de comportamento dos agentes via configuracoes YAML, sem alterar codigo de dominio.
+- Integrar IA de forma pragmática em um backend de API.
+- Transformar áudio médico em dado estruturado consumível por sistemas prévios (EHR, prontuário eletrônico, CRM clínico, automações).
+- Garantir segurança no transporte/processamento de áudio (JWT + AES-GCM).
+- Permitir evolução rápida do comportamento dos agentes via configurações YAML, sem alterar código de domínio.
 
-## Stack tecnologica
+## Stack tecnológica
 
 - `Python 3.11`
 - `FastAPI` + `Uvicorn`
 - `Pydantic` / `Pydantic AI`
 - `Gemini (Google GLA Provider)` como modelo de linguagem atual
-- `PyJWT` para autenticacao
-- `cryptography` (AES-256-GCM) para decriptacao/criptografia de payloads
+- `PyJWT` para autenticação
+- `cryptography` (AES-256-GCM) para decriptação/criptografia de payloads
 - `Docker` + `docker-compose` para ambiente local
-- `Railway` para deploy em producao
+- `Railway` para deploy em produção
 
 ## Arquitetura
 
-### Visao de alto nivel
+### Visão de alto nível
 
 ```mermaid
 flowchart TD
@@ -34,11 +34,11 @@ flowchart TD
     C -->|AES-256-GCM decrypt| D[AudioTranscript Service]
     D --> E[TranscriptAgent - Pydantic AI]
     E --> F[Gemini Model]
-    F --> G[Transcricao]
+    F --> G[Transcrição]
     G --> H[AgentOrchestrator]
     H --> I[AnamnesesModelingAgent]
     H --> J[TranscriptValidatorAgent]
-    I --> K[JSON dinamico via Pydantic model]
+    I --> K[JSON dinâmico via Pydantic model]
     J --> K
     K --> L[Resposta JSON para sistema integrador]
 
@@ -47,7 +47,7 @@ flowchart TD
     M --> J
 
     subgraph Deploy
-        N[Railway - Producao]
+        N[Railway - Produção]
     end
 
     N --> B
@@ -56,38 +56,38 @@ flowchart TD
 ### Componentes principais
 
 - `app/main.py`
-  - Sobe a aplicacao FastAPI.
-  - Carrega dependencias globais via `AppConfigs.load_dependencies()`.
+  - Sobe a aplicação FastAPI.
+  - Carrega dependências globais via `AppConfigs.load_dependencies()`.
   - Configura `CORS` e `TrustedHostMiddleware`.
 - `app/routers/audio.py`
-  - `POST /audio/upload`: autentica request, decripta arquivo e dispara transcricao.
-  - `POST /audio/prontuario`: recebe transcricao + template e gera estrutura de anamnese.
+  - `POST /audio/upload`: autentica request, decripta arquivo e dispara transcrição.
+  - `POST /audio/prontuario`: recebe transcrição + template e gera estrutura de anamnese.
 - `app/security/security.py`
-  - Validacao JWT (`Authorization: Bearer <token>`).
-  - Criptografia/decriptacao AES-256-GCM para payloads de audio.
+  - Validação JWT (`Authorization: Bearer <token>`).
+  - Criptografia/decriptação AES-256-GCM para payloads de áudio.
 - `app/services/AudioTranscript.py`
-  - Encapsula pipeline de transcricao (router -> agente transcritor).
+  - Encapsula pipeline de transcrição (router -> agente transcritor).
 - `app/services/AgentOrchestrator.py`
-  - Orquestra extracao estruturada e validacao do resultado.
+  - Orquestra extração estruturada e validação do resultado.
 - `app/agents/*`
   - `TranscriptAgent`, `AnamnesesModelingAgent`, `TranscriptValidatorAgent` com base comum em `BaseAgent`.
-  - Criacao de agentes centralizada em `AgentFactory`, com retry exponencial para falhas transitorias de provider.
+  - Criação de agentes centralizada em `AgentFactory`, com retry exponencial para falhas transitórias de provider.
 - `app/services/ConfigManager.py` + `app/config/configuracao/*.yaml`
-  - Prompt engineering externalizado por YAML (agentes e configuracoes).
-  - Suporte a reload de configuracao.
+  - Prompt engineering externalizado por YAML (agentes e configurações).
+  - Suporte a reload de configuração.
 - `app/models/models.py`
-  - Modelos de API e geracao dinamica de `Pydantic model` a partir do `anamnesis_template`.
+  - Modelos de API e geração dinâmica de `Pydantic model` a partir do `anamnesis_template`.
 
 ## Fluxo funcional (end-to-end)
 
-1. Cliente envia arquivo de audio criptografado para `POST /audio/upload`.
+1. Cliente envia arquivo de áudio criptografado para `POST /audio/upload`.
 2. API valida token JWT.
 3. API decripta o payload com AES-GCM.
-4. `TranscriptAgent` converte audio em texto.
+4. `TranscriptAgent` converte áudio em texto.
 5. Cliente envia `transcription` + `anamnesis_template` para `POST /audio/prontuario`.
-6. API gera modelo Pydantic dinamico pelo template.
+6. API gera modelo Pydantic dinâmico pelo template.
 7. `AnamnesesModelingAgent` extrai os campos.
-8. Resultado e validado e retornado como JSON estruturado.
+8. O resultado é validado e retornado como JSON estruturado.
 
 ## Estrutura de pastas
 
@@ -122,7 +122,7 @@ app/
 
 ## Como executar
 
-## 1) Variaveis de ambiente
+### 1) Variáveis de ambiente
 
 Crie um arquivo `.env` na raiz:
 
@@ -132,7 +132,7 @@ API_KEY=...          # chave base64-url de 32 bytes para AES-256-GCM
 SECRET_KEY=...       # chave JWT
 ```
 
-## 2) Ambiente local com Docker Compose (recomendado)
+### 2) Ambiente local com Docker Compose (recomendado)
 
 ```bash
 docker compose up --build
@@ -140,7 +140,7 @@ docker compose up --build
 
 API local em: `http://localhost:8023`
 
-## 3) Ambiente local sem Docker
+### 3) Ambiente local sem Docker
 
 ```bash
 pip install -r requirements.txt
@@ -151,14 +151,14 @@ uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
 
 - `GET /` - health check simples
 - `GET /audio/` - endpoint informativo
-- `POST /audio/upload` - recebe arquivo de audio criptografado e retorna transcricao
-- `POST /audio/prontuario` - recebe transcricao + template e retorna JSON de anamnese
+- `POST /audio/upload` - recebe arquivo de áudio criptografado e retorna transcrição
+- `POST /audio/prontuario` - recebe transcrição + template e retorna JSON de anamnese
 
-## Exemplo de payload para estruturacao (`/audio/prontuario`)
+## Exemplo de payload para estruturação (`/audio/prontuario`)
 
 ```json
 {
-  "transcription": "Paciente relata dor toracica ha 3 dias...",
+  "transcription": "Paciente relata dor torácica há 3 dias...",
   "anamnesis_template": {
     "template_name": "AnamneseCardio",
     "fields": [
@@ -166,13 +166,13 @@ uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
         "title": "queixa_principal",
         "type": "text",
         "required": true,
-        "llm_instruction": "Descreva a queixa principal com linguagem clinica objetiva."
+        "llm_instruction": "Descreva a queixa principal com linguagem clínica objetiva."
       },
       {
         "title": "duracao_sintomas",
         "type": "string",
         "required": false,
-        "llm_instruction": "Informar duracao em termos reportados pelo paciente."
+        "llm_instruction": "Informar duração em termos reportados pelo paciente."
       }
     ]
   }
@@ -181,34 +181,37 @@ uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
 
 ## Foco para integração de IA em sistemas previos
 
-- `Arquitetura de integracao`: IA encapsulada em servico HTTP para plugar em sistemas existentes sem reescrever o core do produto.
-- `Orquestracao de agentes`: separacao entre transcricao, extracao e validacao.
-- `Schema-first output`: saida orientada a contrato (modelo Pydantic dinamico) para reduzir friccao com consumidores.
-- `PromptOps`: prompts versionados em YAML, desacoplados do codigo.
-- `Resiliencia`: retries com backoff para falhas transitorias de LLM provider.
-- `Seguranca aplicada`: JWT + criptografia de arquivo em transito/aplicacao.
-- `Deploy real`: execucao em producao via Railway.
+- `Arquitetura de integração`: IA encapsulada em serviço HTTP para plugar em sistemas existentes sem reescrever o core do produto.
+- `Orquestração de agentes`: separação entre transcrição, extração e validação.
+- `Schema-first output`: saída orientada a contrato (modelo Pydantic dinâmico) para reduzir fricção com consumidores.
+- `PromptOps`: prompts versionados em YAML, desacoplados do código.
+- `Resiliência`: retries com backoff para falhas transitórias de LLM provider.
+- `Segurança aplicada`: JWT + criptografia de arquivo em trânsito/aplicação.
+- `Deploy real`: execução em produção via Railway.
 
-## Deploy em producao (Railway)
+## Deploy em produção (Railway)
 
-A aplicacao esta sendo deployada em producao no `Railway`.
+A aplicação está sendo deployada em produção no `Railway`.
 
 Pontos importantes:
 
-- Definir variaveis de ambiente no projeto Railway (`GOOGLE_API_KEY`, `API_KEY`, `SECRET_KEY`).
+- Definir variáveis de ambiente no projeto Railway (`GOOGLE_API_KEY`, `API_KEY`, `SECRET_KEY`).
 - Garantir porta esperada pela plataforma (`PORT`) e health check em `/`.
-- Revisar CORS/hosts permitidos conforme dominio publico.
-- Monitorar logs e latencia de chamadas LLM.
+- Revisar CORS/hosts permitidos conforme domínio público.
+- Monitorar logs e latência de chamadas LLM.
 
 ## Melhorias futuras
 
-### Adicao de Whisper local para transcricao
+### Adição de Whisper local para transcrição
 
-Incorporar um motor de transcricao `Whisper` local na API para aumentar robustez, controle e possivel reducao de custo por chamada externa.
+Incorporar um motor de transcrição `Whisper` local na API para aumentar robustez, controle e possível redução de custo por chamada externa.
 
-### Adaptação da ConfigManager para leitura de serviço externo
+### Adaptação do ConfigManager para leitura de serviço externo
 
-Modificar a CongifManager para leitura dos arquivos YAML de um serviço externo como S3, e adicionar um endpoint de hot-reload dos prompts, permitindo versionamento e iterações rápidas de prompts com agentes, sem necessitar de um novo deploy da aplicação
+Modificar o `ConfigManager` para leitura dos arquivos YAML em um serviço externo, como S3, e adicionar um endpoint de hot-reload dos prompts, permitindo versionamento e iterações rápidas com agentes, sem necessidade de novo deploy da aplicação.
 
-- Adicionar visibilidade via OpenTelemetry
+- Adicionar visibilidade via OpenTelemetry.
+- Adicionar persistência de estado utilizando LangGraph e Redis 
+- Transformar em serviço assíncrono
+
 
