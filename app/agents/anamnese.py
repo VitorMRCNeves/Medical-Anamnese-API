@@ -1,16 +1,16 @@
 import logging
 from typing import Optional, Dict, Any
 from pydantic_ai import Agent
+from pydantic import BaseModel
 from app.agents.AgentBase import BaseAgent
 from app.config.ConfigDependencies import AppConfigs
-from app.models.models import AudioResponse
 
 logger = logging.getLogger(__name__)
 
 
-class TranscriptAgent(BaseAgent):
+class AnamnesesModelingAgent(BaseAgent):
     """
-    Agente transcritor para transcrever a Anamnese.
+    Agente modela a Anamnese apartir da transcrição.
     """
 
     def __init__(
@@ -19,17 +19,17 @@ class TranscriptAgent(BaseAgent):
         llm_model: Any,
     ):
         """
-        Inicializa o agente transcritor.
+        Inicializa o agente anamnese.
         """
         super().__init__(
-            agent_name="transcritor",
+            agent_name="anamnese",
             config_manager=deps.config_manager,
             llm_model=llm_model,
         )
         self._agent: Optional[Agent] = None
         self._deps = deps
 
-    def _inicia_agente(self) -> Agent:
+    def _inicia_agente(self, fields) -> Agent:
         """
         Inicializa a instância do agente com prompt personalizado.
 
@@ -37,26 +37,28 @@ class TranscriptAgent(BaseAgent):
             Instância do Agent configurado
         """
         self._agent = self._create_agent_instance(
-            output_type=AudioResponse,
+            output_type=fields,
         )
         return self._agent
 
     async def execute(
         self,
-        audio: str,
+        transcript: str,
+        fields: BaseModel,
         user_id: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None,
     ) -> str:
         """
-        Executa o agente transcritor de intenção com a mensagem e contexto do usuário.
+        Executa o agente validador, recebendo o transcript e o extraction,
+        e valida se a extraction está boa o suficiente dado o transcript.
 
         Args:
-            message: Mensagem do usuário
-            user_id: ID do usuário (opcional, para personalização)
-            context: Contexto adicional (histórico, metadata, etc) do N8N
+            transcript: Transcrição da consulta médica
+            user_id: ID do usuário (opcional)
+            context: Contexto adicional (opcional)
 
         Returns:
-            Resposta do agente como string
+            Resposta do agente como string (True/False)
 
         Raises:
             Exception: Erros durante a execução
@@ -65,13 +67,21 @@ class TranscriptAgent(BaseAgent):
             agent = self._inicia_agente()
 
             logger.info(
-                f"Executando agente de intenção para user_id={user_id}, "
-                f"message_length={len(audio)}"
+                f"Executando agente validador para user_id={user_id}, "
+                f"message_length={len(transcript)}"
             )
 
-            result = await agent.run(
-                audio,
+            user_prompt = (
+                "A seguir está a transcrição completa de uma consulta médica. "
+                "Com base apenas nesse transcript, extraia e retorne um JSON com os campos relevantes da anamnese conforme o modelo esperado. "
+                "Certifique-se de preencher todos os campos possíveis a partir das informações disponíveis, mantendo a precisão e completude. "
+                "Retorne apenas o JSON extraído, sem explicações adicionais.\n\n"
+                "TRANSCRIÇÃO:\n"
+                f"{transcript}\n\n"
+                "Retorne o JSON de campos extraídos:"
             )
+
+            result = await agent.run(user_prompt)
 
             response = result.output
 

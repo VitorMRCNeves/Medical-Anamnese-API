@@ -1,16 +1,15 @@
 from fastapi import FastAPI
-from app.routers import audio
+from app.routers.audio import audio_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-import os
-from config.ConfigDependencies import AppDependencies
+from app.config.ConfigDependencies import AppConfigs
 
 
-deps = AppDependencies.load_dependencies()
+deps = AppConfigs.load_dependencies()
 app = FastAPI()
 
 
-app.include_router(audio.router)
+app.include_router(audio_router(deps))
 
 app.add_middleware(
     CORSMiddleware,

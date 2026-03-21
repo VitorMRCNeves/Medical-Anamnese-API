@@ -1,11 +1,12 @@
 from app.models.models import AudioResponse
 from pydantic_ai import BinaryContent
 from fastapi import UploadFile
-from agents.transcritor import TranscriptAgent
+from app.agents.transcritor import TranscriptAgent
+from app.config.ConfigDependencies import AppConfigs
 
 
 class AudioTranscript:
-    def __init__(self, deps):
+    def __init__(self, deps: AppConfigs):
         self.deps
 
     async def convert_audio_to_bytes(self, audio_file: UploadFile) -> bytes:

@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from app.main import IS_PRODUCTION
-from services.ConfigManager import ConfigManager
-from security.security import SecurityManager
+from app.services.ConfigManager import ConfigManager
+from app.security.security import SecurityManager
 from pydantic_ai.models.gemini import GeminiModel
 from pydantic_ai.providers.google_gla import GoogleGLAProvider
+from typing import Optional, List, Dict
 import os
 
 
@@ -12,10 +12,7 @@ class AppConfigs:
     config_manager: ConfigManager
     security_manager: SecurityManager
     google_model: GeminiModel
-
-    IS_PRODUCTION = (
-        os.getenv("RAILWAY_ENVIRONMENT") is not None or os.getenv("PORT") is not None
-    )
+    is_production: bool
 
     @classmethod
     def load_dependencies(cls):
@@ -29,6 +26,10 @@ class AppConfigs:
             model_name="gemini-2.0-flash",
             provider=GoogleGLAProvider(api_key=google_api_key),
         )
+        IS_PRODUCTION = (
+            os.getenv("RAILWAY_ENVIRONMENT") is not None
+            or os.getenv("PORT") is not None
+        )
 
         instance = cls(
             config_manager=config_instance,
@@ -38,3 +39,21 @@ class AppConfigs:
         )
 
         return instance
+
+
+@dataclass
+class AgentExecutionInputs:
+    """
+    Entrada padronizada para execução de agentes.
+
+    Contém todas as informações necessárias para executar um agente:
+    - Mensagem do usuário
+    - Contexto da conversa
+    - Identificação do usuário
+    - Prompt customizado (opcional)
+    """
+
+    message: str
+    user_id: Optional[str] = None
+    context: Optional[List[Dict]] = None
+    prompt: str | None = None

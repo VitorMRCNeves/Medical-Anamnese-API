@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aiapi-dev
+    working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8023 --reload --reload-dir /app/app
+    ports:
+      - "8023:8023"
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      API_KEY: ${API_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - ./app:/app/app
+    restart: unless-stopped

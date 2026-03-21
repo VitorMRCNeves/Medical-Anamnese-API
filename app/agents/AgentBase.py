@@ -2,9 +2,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 from pydantic_ai import Agent, RunContext
-from services.ChatInterface import AgentFactory
-from services.ConfigManager import ConfigManager
-from config.configs import AgentExecutionInputs
+from app.services.ChatInterface import AgentFactory
+from app.services.ConfigManager import ConfigManager
+from app.config.ConfigDependencies import AgentExecutionInputs
 
 logger = logging.getLogger(__name__)
 

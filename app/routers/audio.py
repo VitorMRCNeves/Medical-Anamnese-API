@@ -2,12 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from app.models.models import AudioResponse
 from app.services.AudioTranscript import AudioTranscript
 from app.services.AgentOrchestrator import AgentOrchestrator
-from app.security.security import SecurityManager
 from app.config.ConfigDependencies import AppConfigs
 import json
 
 
-def chat_router(deps: AppConfigs):
+def audio_router(deps: AppConfigs):
     router = APIRouter(prefix="/audio", tags=["audio"])
 
     async def get_transcript() -> AudioTranscript:
@@ -18,6 +17,9 @@ def chat_router(deps: AppConfigs):
             GraphExecutionManager: Instância configurada do gerenciador de execução
         """
         return AudioTranscript(deps=deps)
+
+    async def get_orchestrator() -> AgentOrchestrator:
+        return AgentOrchestrator(deps=deps)
 
     @router.get("/")
     def get_audio():
@@ -59,7 +61,7 @@ def chat_router(deps: AppConfigs):
     async def get_prontuario(
         headers: Request,
         json_data: dict,
-        agent_orchestrator: AgentOrchestrator = Depends(AgentOrchestrator),
+        agent_orchestrator: AgentOrchestrator = Depends(get_orchestrator),
     ) -> dict:
 
         deps.security_manager.authenticate_user(headers)
