@@ -1,4 +1,4 @@
-# API de Transcricao e Estruturacao de Anamnese com IA
+# API de Transcrição e Estruturação de Anamnese com IA
 
 API em `FastAPI` para receber audio criptografado de consultas, transcrever com LLM e estruturar dados de anamnese em JSON dinamico para integracao com sistemas clinicos existentes.
 
