@@ -179,7 +179,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
 }
 ```
 
-## Foco para integracao de IA em sistemas previos
+## Foco para integração de IA em sistemas previos
 
 - `Arquitetura de integracao`: IA encapsulada em servico HTTP para plugar em sistemas existentes sem reescrever o core do produto.
 - `Orquestracao de agentes`: separacao entre transcricao, extracao e validacao.
